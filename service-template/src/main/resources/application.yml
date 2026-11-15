@@ -1,0 +1,26 @@
+# غيّر 3 حاجات بس: port, application.name, اسم الداتابيز (من docs/CONTRACT.md)
+server:
+  port: 8090
+
+spring:
+  application:
+    name: template-service
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/template_db}
+    username: ${DB_USER:postgres}
+    password: ${DB_PASSWORD:postgres}
+  jpa:
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_URL:http://localhost:8761/eureka}
+  instance:
+    prefer-ip-address: true
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html

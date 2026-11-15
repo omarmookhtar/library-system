@@ -1,0 +1,102 @@
+name: library-system
+
+# تشغيل كل حاجة:  docker compose up --build
+# لو سيرفس لسه مش موجود في الريبو، علّم عليه بـ # لحد ما يتضاف.
+x-service-env: &service-env
+  DB_USER: postgres
+  DB_PASSWORD: postgres
+  EUREKA_URL: http://eureka-server:8761/eureka
+  JWT_SECRET: ${JWT_SECRET:-library-system-secret-key-change-me-2026-please}
+
+services:
+  postgres:
+    image: postgres:16
+    container_name: library-postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./docker/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  eureka-server:
+    build: ./eureka-server
+    container_name: eureka-server
+    ports:
+      - "8761:8761"
+
+  api-gateway:
+    build: ./api-gateway
+    container_name: api-gateway
+    ports:
+      - "8080:8080"
+    environment:
+      <<: *service-env
+    depends_on:
+      - eureka-server
+
+  user-service:
+    build: ./user-service
+    container_name: user-service
+    ports:
+      - "8081:8081"
+    environment:
+      <<: *service-env
+      DB_URL: jdbc:postgresql://postgres:5432/user_db
+    depends_on:
+      postgres:
+        condition: service_healthy
+      eureka-server:
+        condition: service_started
+
+  catalog-service:
+    build: ./catalog-service
+    container_name: catalog-service
+    ports:
+      - "8082:8082"
+    environment:
+      <<: *service-env
+      DB_URL: jdbc:postgresql://postgres:5432/catalog_db
+    depends_on:
+      postgres:
+        condition: service_healthy
+      eureka-server:
+        condition: service_started
+
+  borrowing-service:
+    build: ./borrowing-service
+    container_name: borrowing-service
+    ports:
+      - "8083:8083"
+    environment:
+      <<: *service-env
+      DB_URL: jdbc:postgresql://postgres:5432/borrowing_db
+    depends_on:
+      postgres:
+        condition: service_healthy
+      eureka-server:
+        condition: service_started
+
+  fines-service:
+    build: ./fines-service
+    container_name: fines-service
+    ports:
+      - "8084:8084"
+    environment:
+      <<: *service-env
+      DB_URL: jdbc:postgresql://postgres:5432/fines_db
+    depends_on:
+      postgres:
+        condition: service_healthy
+      eureka-server:
+        condition: service_started
+
+volumes:
+  pgdata:
