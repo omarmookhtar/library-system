@@ -118,3 +118,26 @@ Borrowing → catalog-service  (التأكد من التوافر + نقص/زيا
 Borrowing → fines-service    (فحص الغرامات غير المدفوعة + حساب الغرامة عند الإرجاع)
 Fines     → borrowing-service (تقرير المتأخرات)
 ```
+
+## 8) حسابات تجريبية (بتتعمل أوتوماتيك أول ما user-service يشتغل)
+
+| Role | Email | Password |
+|---|---|---|
+| ADMIN | admin@library.com | Admin@123 |
+| LIBRARIAN | librarian@library.com | Librarian@123 |
+| MEMBER | member@library.com | Member@123 |
+
+## 9) تجربة سريعة بعد تشغيل Eureka + Gateway + user-service
+
+```
+POST http://localhost:8080/api/auth/login
+{ "email": "admin@library.com", "password": "Admin@123" }
+```
+الرد: `{ "token": "...", "role": "ADMIN", "userId": 1, "name": "Admin" }`
+وبعدها ابعت الهيدر `Authorization: Bearer <token>` مع باقي الطلبات.
+
+## 10) قواعد الـ Gateway
+- التحقق من الـ JWT وصلاحيات كل endpoint في `api-gateway/.../SecurityConfig.java` (مكان واحد).
+- لو أضفت endpoint جديد في سيرفسك، ابلّغ عمر عشان يضيف قاعدته. لحد ما يتضاف، أي مستخدم مسجل دخول يقدر يوصله.
+- الـ Gateway بيمسح `X-User-Id` و`X-User-Role` من أي request جاي من برة، وبيحطهم هو من التوكن بس.
+- أخطاء الـ Gateway: `401` (مفيش توكن أو غلط)، `403` (role غلط) بنفس شكل الـ error الموحد.
