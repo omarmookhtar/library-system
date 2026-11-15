@@ -13,6 +13,9 @@
 | Borrowing | borrowing-service | 8083 | borrowing_db | حسن |
 | Fines/Reports | fines-service | 8084 | fines_db | عماد |
 
+> **الداتابيز (Docker):** PostgreSQL على `localhost:5433` (user/password: `postgres`/`postgres`). جوه شبكة Docker البورت 5432.
+> **الـ Gateway:** افتراضي 8080. لو بورت 8080 مشغول عندك، شغّله على بورت تاني بس عندك أنت.
+
 ## 2) الـ Roles والـ JWT
 
 - الـ Roles بالظبط: `ADMIN`, `LIBRARIAN`, `MEMBER`

@@ -13,6 +13,9 @@
 | borrowing-service | 8083 | borrowing_db |
 | fines-service | 8084 | fines_db |
 
+## Database
+PostgreSQL (Docker) على `localhost:5433` (جوه شبكة Docker: 5432).
+
 ## Roles
 `ADMIN`, `LIBRARIAN`, `MEMBER`
 

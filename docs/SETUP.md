@@ -20,7 +20,7 @@
 - Spring Boot **3.3.5**
 - Spring Cloud **2023.0.3**
 - springdoc-openapi **2.6.0**
-- PostgreSQL **16** (من Docker، مش لازم تثبته)
+- PostgreSQL **16** (من Docker، مش لازم تثبته). بورت الـ Docker على جهازك هو **5433** (مش 5432) عشان ما يتصادمش مع أي PostgreSQL متثبت عندك.
 
 ممنوع حد يغير النسخ لوحده. ده اللي بيمنع مشاكل "على جهازي شغال".
 
@@ -48,7 +48,7 @@ feature/<اسمك>-<الحاجة>   ← مثال: feature/hassan-borrow-rules
    - `server.port` و `spring.application.name` في `application.yml`
    - اسم الداتابيز في `DB_URL` الافتراضي
    - اسم الـ package (Refactor → Rename في IntelliJ)
-3. شغّل الداتابيز: `docker compose up -d postgres`
+3. شغّل الداتابيز: `docker compose up -d postgres` (بتشتغل على `localhost:5433`)
 4. شغّل Eureka من IntelliJ (`eureka-server`) ثم سيرفسك.
 5. افتح `http://localhost:8761` وتأكد إن سيرفسك ظهر.
 6. Swagger: `http://localhost:<port>/swagger-ui.html`
@@ -70,7 +70,11 @@ docker compose up --build
 | المشكلة | الحل |
 |---|---|
 | السيرفس مش بيظهر في Eureka | تأكد `spring.application.name` والـ `EUREKA_URL` |
-| `Connection refused` للداتابيز | شغّل `docker compose up -d postgres` وتأكد من اسم الـ DB |
+| `Connection refused` للداتابيز | شغّل `docker compose up -d postgres` وتأكد من اسم الـ DB وإن البورت `5433` |
+| `password authentication failed for user "postgres"` | غالبًا بتكلم PostgreSQL متثبت عندك على 5432. تأكد إن الـ URL فيه `localhost:5433` |
+| Gateway: `Port 8080 was already in use` (مثلًا Oracle) | شغّله على بورت تاني: `mvn spring-boot:run "-Dspring-boot.run.arguments=--server.port=8085"` وكلّمه على 8085 |
+| `docker compose` يقول `no configuration file provided` | لازم تكون جوه فولدر `library-system` اللي فيه `docker-compose.yml` |
+| Docker يقول `failed to connect to the docker API` | افتح Docker Desktop واستنى لحد ما يشتغل |
 | Port already in use | غيّر البورت أو اقفل البرنامج اللي شاغله |
 | Gateway يرجّع 503 | السيرفس مش مسجل في Eureka لسه (استنى 30 ثانية) |
 | اختلاف نسخ Spring | استخدم النسخ في القسم 2 بالظبط |
